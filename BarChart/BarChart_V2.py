@@ -1,107 +1,117 @@
+#bar chart-monthly(comparison)
+from math import ceil
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from bidi.algorithm import get_display
 import arabic_reshaper
-from math import ceil
+def bar_cahrt_comparison_monthly(FileAddressMainDatabase,first_considered_year,
+                                 second_considered_year,saving_file_path,company_list,
+                                 first_number_of_month,last_number_of_month,name):
+
+    df=pd.read_excel('D:/razaghi/Products_list.xlsx')
+    products_list=dict(df)
+    barcode=np.array(products_list['barcode'])
+    Coefficient=np.array(products_list['amount per package'])
 
 
+    df1=pd.read_excel(FileAddressMainDatabase)
+    data1_1=dict(df1)
+    data2_1=np.array([data1_1['Column 1-Date'],data1_1['Column 2-Product name'],
+                      data1_1['Column 3-Product barcode'],data1_1['Column 4-Sale amount'],
+                      data1_1['Column 5-Customer code'],data1_1['Column 6-Warehouse name']])
 
-def BarChart_V2(fileAddress_1,first_considered_year,fileAddress_2,
-                                 second_considered_year,saving_file_path,company_code_list,
-                                 first_number_of_month,last_number_of_month):
-    company_list=pd.read_excel('D:/razaghi/company_list.xlsx')
-    company_list_data=dict(company_list)
-    names=list(company_list_data.keys())
-    print("names: ",names)
 
-    for name in names:
-        df=pd.read_excel('D:/razaghi/Products_list.xlsx')
-        products_list=dict(df)
-        df1=pd.read_excel('D:/razaghi/total-1401 to 1404.xlsx')
-        data1=dict(df1)
-        data2=np.array([data1['Column 1-Date'],data1['Column 2-Product name'],
-                          data1['Column 3-Product barcode'],data1['Column 4-Sale amount'],
-                          data1['Column 5-Customer code'],data1['Column 6-Warehouse name']])
-        barcode=np.array(products_list['barcode'])
-        Coefficient=np.array(products_list['amount per package'])
+    x_1=[]
 
-   
+    for i in range(int(first_number_of_month),int(last_number_of_month)+1):
+        summ=0
+        for j in range(len(barcode)):
+            for k in range(0,len(data2_1[2,:])):
+                if int(str(data2_1[0,k][5:7]))== i and barcode[j]==data2_1[2,k] and first_considered_year[-1] == int(str(data2_1[0, k][3]))  and data2_1[4,k] in company_list and data2_1[5,k]!='انبار مرجوعی' and data2_1[5,k]!='انبار ضایعات':
+                    summ=summ+ceil((data2_1[3,k])/Coefficient[j])
+                else:
+                    continue
+        x_1.append([i,summ])
+    xx_1=np.array(x_1)
 
-        company_code_list=company_list_data[name].values
-        print("name: ",name)
-        print('company_code_list: ',company_code_list)
 
-    a1=[]
-    for i in range(0,len(barcode)):
-        summ1=0
-        for j in range(0,len(data2[3,:])):
-            if str(data2[0, j][5:7]) in ['01', '02', '03','04','05','06','07','08','09','10','11','12'] and 3 == int(str(data2[0, j][3])) and barcode[i]==data2[3,j] and data2[8,j]!='انبار مرجوعی' and data2[8,j]!='انبار ضایعات'and data2[7,j] in company_code_list:
-                summ1=summ1+ceil(data2[4,j]/Coefficient[i])
-            else:
-                continue
-        a1.append([barcode[i],summ1])
-    a1=np.array(a1)
-    # print('a1: ',a1)
-    a2=[]
-    for i in range(0,len(barcode)):
-        summ2=0
-        for j in range(0,len(data2[2,:])):
-            if str(data2[0, j][5:7]) in ['01', '02', '03','04','05','06','07','08','09','10','11','12'] and 4 == int(str(data2[0, j][3])) and barcode[i]==data2[3,j] and data2[8,j]!='انبار مرجوعی' and data2[8,j]!='انبار ضایعات'and data2[7,j] in company_code_list:
-                summ2=summ2+ceil(data2[4,j]/Coefficient[i])
-            else:
-                continue
-        a2.append([barcode[i],summ2])
-    a2=np.array(a2)
-    # print('a2: ',a2)
+    x_2=[]
+
+    for i in range(int(first_number_of_month),int(last_number_of_month)+1):
+        summ=0
+        for j in range(len(barcode)):
+            
+            for k in range(0,len(data2_1[2,:])):
+                if int(str(data2_1[0,k][5:7]))==i and barcode[j]==data2_1[2,k] and first_considered_year[-1] == int(str(data2_1[0, k][3])) and data2_1[4,k] in company_list and data2_1[5,k]!='انبار مرجوعی' and data2_1[5,k]!='انبار ضایعات':
+                    summ=summ+ceil((data2_1[3,k])/Coefficient[j])
+                else:
+                    continue
+        x_2.append([i,summ])
+    xx_2=np.array(x_2)
     
-    y1_final=[]
-    y2_final=[]
-    for cc in range(0,len(a1[:,1])):
-        if a1[cc,1]!=0 or a2[cc,1]!=0:
-            y1_final.append(a1[cc])
-            y2_final.append(a2[cc])
-        else:
-            continue
-        
-    y1_final=np.array(y1_final)
-    y2_final=np.array(y2_final)
-    z1=[]
-    for e in y1_final[:,0]:
-        for c in range(0,len(products_list['barcode'])):
-            if products_list['barcode'][c]==e:
-                z1.append(products_list['name'][c])
-            else:
-                continue
-    x1=[get_display(arabic_reshaper.reshape(d)) for d in z1]
-    x = np.arange(len(x1))
-    plt.rcParams["figure.figsize"] = (25,6)
+    #Names of the Persian months
+    month=np.array(['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'])
+    
+    #Names of the Gregorian months
+    #month=np.array(['January','February','March','April','May','June','July','August','September','October','November','December'])
+    
+    x1=[get_display(arabic_reshaper.reshape(d)) for d in month]
+    width=0.35
+    x11 = np.arange(len(x1))
+    y1=xx_1[:,1]
+    y2=xx_2[:,1]
     fig, ax = plt.subplots()
-    width=0.5
-    bar1=ax.bar(x - width/2, y1_final[:,1], width=width, label='1402')
-    bar2=ax.bar(x + width/2, y2_final[:,1], width=width, label='1403',color='orange')
-    ax.set_ylabel(get_display(arabic_reshaper.reshape('تعداد کارتن')), fontsize='30')
-    ax.set_title(get_display(arabic_reshaper.reshape(f'مقایسه فروش کارتنی سال‌های 1403 و 1404 به تفکیک کالا-{name}-12 ماهه')), fontsize=35)
-    ax.set_xticks(x)
-    ax.set_yticks([])
-    ax.set_yticklabels([])
-    ax.spines[['right', 'top','left']].set_visible(False)
-    zz=[get_display(arabic_reshaper.reshape(d)) for d in z1]
-    ax.set_xticklabels(zz, rotation=90, fontsize='30')
-
-    plt.rcParams['font.family'] = 'B nazanin'
-    ax.legend(fontsize='25')
-    plt.savefig(f'D:/razaghi/total/{name}_bar_chart_comparison.png', bbox_inches='tight')
-    aa=[]
-    for hg in range(0,len(z1)):
-        aa.append([z1[hg],y1_final[hg,1],y2_final[hg,1]])
-    aa=np.array(aa)
-    final_data={
-        'product name':list(aa[:,0]),
-        '1402':list(aa[:,1]),
-        '1403':list(aa[:,2])
-    }
-    final_data=pd.DataFrame(final_data)
-    final_data.to_excel(f'D:/razaghi/total/{name}_products.xlsx', index=False)
-
+    bar1 = ax.bar(x11[int(first_number_of_month)-1:int(last_number_of_month)] - width/2, y1, width, label=str(first_considered_year))
+    bar2 = ax.bar(x11[int(first_number_of_month)-1:int(last_number_of_month)] + width/2, y2, width, label=str(second_considered_year))
+    x = np.arange(len(xx_1[:,0]))
     
+   
+    plt.rcParams["figure.figsize"] = (25,5)
+
+    for line_x in x11[int(first_number_of_month)-1:int(last_number_of_month)]:
+        
+        plt.axvline(x=line_x + 1.5*width, color='r', linestyle='-.')
+    
+    ax.set_xlabel(get_display(arabic_reshaper.reshape('Month')),fontsize=20)
+    ax.set_ylabel(get_display(arabic_reshaper.reshape('Quantity (cartons)')),fontsize=20)
+    ax.set_title(get_display(arabic_reshaper.reshape(f'title-{name}')), fontsize=25)
+    ax.spines[['right', 'top','left']].set_visible(False)
+    ax.set_yticklabels([])
+    ax.set_yticks([])
+    
+    ax.set_xticks(x11[int(first_number_of_month)-1:int(last_number_of_month)+1],x1[int(first_number_of_month)-1:int(last_number_of_month)+1],fontsize=20)
+    plt.rcParams['font.family'] = 'B nazanin'
+    for bar in bar1:
+        yval = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2., yval, '%d' % yval, ha='center', va='bottom', fontsize='25')
+
+    for bar in bar2:
+        yval = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2., yval, '%d' % yval, ha='center', va='bottom', fontsize='25')
+    ax.legend(fontsize=15)
+    plt.savefig(f'D:/razaghi/شهروند/report/{name}_monthly_comparison.png', bbox_inches='tight')
+    aaa=[]
+    for hg in range(0,len(xx_2)):
+        changes="{:.2f}".format(((xx_2[hg,1]-xx_1[hg,1])/xx_1[hg,1]))
+        aaa.append([hg,xx_1[hg,1],xx_2[hg,1],changes])
+    aaa=np.array(aaa)
+    comparison_monthly_data={
+        'month':list(aaa[:,0]),
+        f'{first_considered_year}':list(aaa[:,1]),
+        f'{second_considered_year}':list(aaa[:,2]),
+        'Changes(Percentage)': list(aaa[:,3])
+           }
+    comparison_monthly_data=pd.DataFrame(comparison_monthly_data)
+    file_path = saving_file_path  # Define the file path and name
+    comparison_monthly_data.to_excel(file_path, index=False)
+    print(name)
+#########################################################################################################################################################
+company_list=pd.read_excel('D:/example/company_code_list.xlsx')
+names=list(company_list.keys())
+
+for name in names:
+    
+    company_code_list=[company_list[name]]
+    bar_cahrt_comparison_monthly('D:/example/total-1401 to 1404.xlsx','1403','1404',
+                                 f'D:/example/{name}-monthly.xlsx',company_code_list,1,3,name) 

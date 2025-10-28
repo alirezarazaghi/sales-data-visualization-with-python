@@ -32,11 +32,11 @@ def bar_cahrt_comparison_monthly(fileAddress_1,first_considered_year,fileAddress
 
     x_1=[]
 
-    for i in range(int(t1),int(t2)+1):
+    for i in range(int(first_number_of_month),int(last_number_of_month)+1):
         summ=0
         for j in range(len(barcode)):
             for k in range(0,len(data2_1[2,:])):
-                if int(str(data2_1[0,k][5:7]))== i and barcode[j]==data2_1[2,k] and 3 == int(str(data2_1[0, k][3]))  and data2_1[4,k] in company_list and data2_1[5,k]!='انبار مرجوعی' and data2_1[5,k]!='انبار ضایعات':
+                if int(str(data2_1[0,k][5:7]))== i and barcode[j]==data2_1[2,k] and 3 == int(str(data2_1[0, k][3]))  and data2_1[4,k] in company_code_list and data2_1[5,k]!='انبار مرجوعی' and data2_1[5,k]!='انبار ضایعات':
                     summ=summ+ceil((data2_1[3,k])/Coefficient[j])
                 else:
                     continue
@@ -46,12 +46,12 @@ def bar_cahrt_comparison_monthly(fileAddress_1,first_considered_year,fileAddress
 
     x_2=[]
 
-    for i in range(int(t1),int(t2)+1):
+    for i in range(int(first_number_of_month),int(last_number_of_month)+1):
         summ=0
         for j in range(len(barcode)):
             
             for k in range(0,len(data2_2[2,:])):
-                if int(str(data2_2[0,k][5:7]))==i and barcode[j]==data2_2[2,k] and 4 == int(str(data2_2[0, k][3])) and data2_2[4,k] in company_list and data2_2[5,k]!='انبار مرجوعی' and data2_2[5,k]!='انبار ضایعات':
+                if int(str(data2_2[0,k][5:7]))==i and barcode[j]==data2_2[2,k] and 4 == int(str(data2_2[0, k][3])) and data2_2[4,k] in company_code_list and data2_2[5,k]!='انبار مرجوعی' and data2_2[5,k]!='انبار ضایعات':
                     summ=summ+ceil((data2_2[3,k])/Coefficient[j])
                 else:
                     continue
@@ -71,25 +71,25 @@ def bar_cahrt_comparison_monthly(fileAddress_1,first_considered_year,fileAddress
     y1=xx_1[:,1]
     y2=xx_2[:,1]
     fig, ax = plt.subplots()
-    bar1 = ax.bar(x11[int(t1)-1:int(t2)] - width/2, y1, width, label=first_considered_year)
-    bar2 = ax.bar(x11[int(t1)-1:int(t2)] + width/2, y2, width, label=second_considered_year)
+    bar1 = ax.bar(x11[int(first_number_of_month)-1:int(last_number_of_month)] - width/2, y1, width, label=f'{first_considered_year}')
+    bar2 = ax.bar(x11[int(first_number_of_month)-1:int(last_number_of_month)] + width/2, y2, width, label=f'{second_considered_year}')
     x = np.arange(len(xx_1[:,0]))
     
    
     plt.rcParams["figure.figsize"] = (25,5)
 
-    for line_x in x11[int(t1)-1:int(t2)]:
+    for line_x in x11[int(first_number_of_month)-1:int(last_number_of_month)]:
         
         plt.axvline(x=line_x + 1.5*width, color='r', linestyle='-.')
     
-    ax.set_xlabel(get_display(arabic_reshaper.reshape('month')),fontsize=20)
+    ax.set_xlabel(get_display(arabic_reshaper.reshape('Month')),fontsize=20)
     ax.set_ylabel(get_display(arabic_reshaper.reshape('Quantity (cartons)')),fontsize=20)
     ax.set_title(get_display(arabic_reshaper.reshape('Plot Title')), fontsize=25)
     ax.spines[['right', 'top','left']].set_visible(False)
     ax.set_yticklabels([])
     ax.set_yticks([])
     
-    ax.set_xticks(x11[int(t1)-1:int(t2)+1],x1[int(t1)-1:int(t2)+1],fontsize=20)
+    ax.set_xticks(x11[int(first_number_of_month)-1:int(last_number_of_month)+1],x1[int(first_number_of_month)-1:int(last_number_of_month)+1],fontsize=20)
 
     #Setting up text font
     plt.rcParams['font.family'] = 'B nazanin'
@@ -103,7 +103,7 @@ def bar_cahrt_comparison_monthly(fileAddress_1,first_considered_year,fileAddress
     ax.legend(fontsize=15)
     plt.show()
     aaa=[]
-    print(x11[int(t1):int(t2)+1])
+    print(x11[int(first_number_of_month):int(last_number_of_month)+1])
 
     #creating excel file and calculating Comparison sales related to same months in different years
     for hg in range(0,len(xx_2)):
@@ -118,7 +118,7 @@ def bar_cahrt_comparison_monthly(fileAddress_1,first_considered_year,fileAddress
            }
     comparison_monthly_data=pd.DataFrame(comparison_monthly_data)
     print(comparison_monthly_data)
-    file_path = fp  # Define the file path and name
+    file_path = saving_file_path  # Define the file path and name
     comparison_monthly_data.to_excel(file_path, index=False)
 #########################################################################################################################################################
 #bar_cahrt_comparison_monthly(adress1,name1,adress2,name2,file path,company)
